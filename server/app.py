@@ -60,6 +60,30 @@ def get_recommendations(browsed_products, category=None):
 def index():
     return '<h1>Welcome to Marketspace Recommendation App</h1>'
 
+@app.route('/recommend', methods=['POST'])
+def recommend():
+    try:
+        data = request.json
+        browsed_products = data.get('browsed_products', [])
+        category = data.get('category', None)
+        recommendations = get_recommendations(browsed_products, category)
+        message = generate_message(browsed_products, products)
+        return jsonify({'recommendations': recommendations, 'message': message})
+    except Exception as e:
+        return jsonify({'message': f'Error: {str(e)}', 'recommendations': []}), 500
+
+@app.route('/log_click', methods=['POST'])
+def log_click():
+    try:
+        data = request.json
+        product = data.get('product')
+        with open('click_log.txt', 'a') as f:
+            f.write(f"{product}\n")
+        return jsonify({'status': 'logged'})
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
