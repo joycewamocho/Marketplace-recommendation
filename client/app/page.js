@@ -3,6 +3,9 @@ import { useState } from 'react';
 import Head from 'next/head';
 import ProductCard from './components/ProductCard';
 import { Search, ShoppingBag, Loader2, Mail } from 'lucide-react';
+import SweetAlert from './components/SweatAlert';
+
+
 
 export default function Home() {
   const [browsed, setBrowsed] = useState('');
@@ -10,6 +13,8 @@ export default function Home() {
   const [message, setMessage] = useState('');
   const [recommendations, setRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const getRecommendations = async () => {
     if (!browsed.trim()) {
@@ -54,6 +59,11 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ product }),
       });
+      // Show sweet alert
+      setAlertMessage(`Added "${product}" to your recently viewed items!`);
+      setShowAlert(true);
+      // Hide after 3 seconds
+      setTimeout(() => setShowAlert(false), 3000);
     } catch (error) {
       console.error('Error logging click:', error);
     }
@@ -66,6 +76,13 @@ export default function Home() {
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
+      
+      {/* Sweet Alert */}
+      <SweetAlert 
+        show={showAlert} 
+        message={alertMessage} 
+        onClose={() => setShowAlert(false)} 
+      />
       
       {/* Header */}
       <header className="bg-white shadow-md sticky top-0 z-10">
@@ -80,12 +97,6 @@ export default function Home() {
             <ul className="flex space-x-8">
               <li className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition cursor-pointer border-b-2 border-transparent hover:border-indigo-600 pb-1">
                 Home
-              </li>
-              <li className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition cursor-pointer border-b-2 border-transparent hover:border-indigo-600 pb-1">
-                Categories
-              </li>
-              <li className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition cursor-pointer border-b-2 border-transparent hover:border-indigo-600 pb-1">
-                About
               </li>
             </ul>
           </nav>
@@ -249,6 +260,23 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Add animation styles */}
+      <style jsx global>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fade-in-up {
+          animation: fadeInUp 0.3s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 }
